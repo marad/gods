@@ -1,6 +1,7 @@
 package hashmap
 
 import (
+	"fmt"
 	. "github.com/smartystreets/goconvey/convey"
 	. "gods"
 	"testing"
@@ -50,26 +51,26 @@ func TestHashing(t *testing.T) {
 	})
 }
 
-func TestValueNodeImplementation(t *testing.T) {
-	var vn ValueNode
-	var copied ValueNode
-	Convey("Given a ValueNode", t, func() {
-		vn = ValueNode{123, "Hello"}
-		Convey("When assoc-ing new value to the node", func() {
-			copied = vn.Assoc(123, "World", 0).(ValueNode)
-
-			Convey("Copied node should have the new value", func() {
-				So(copied.Key, ShouldEqual, 123)
-				So(copied.BaseValue, ShouldEqual, "World")
-			})
-
-			Convey("Original node should not have changed", func() {
-				So(vn.Key, ShouldEqual, 123)
-				So(vn.BaseValue, ShouldEqual, "Hello")
-			})
-		})
-	})
-}
+//func TestValueNodeImplementation(t *testing.T) {
+//	var vn ValueNode
+//	var copied SubtreeNode
+//	Convey("Given a ValueNode", t, func() {
+//		vn = ValueNode{2, "Hello"}
+//		Convey("When assoc-ing new value to the node", func() {
+//			copied = vn.Assoc(2, "World", 0).(SubtreeNode)
+//
+//			Convey("Copied node should have the new value", func() {
+//				So(copied.Branches[2].(ValueNode).Key, ShouldEqual, 2)
+//				So(copied.Branches[2].(ValueNode).BaseValue, ShouldEqual, "World")
+//			})
+//
+//			Convey("Original node should not have changed", func() {
+//				So(vn.Key, ShouldEqual, 2)
+//				So(vn.BaseValue, ShouldEqual, "Hello")
+//			})
+//		})
+//	})
+//}
 
 func TestBasicHashMapFunctionality(t *testing.T) {
 	var emptyMap *HashMap
@@ -127,7 +128,27 @@ func TestOverridingAValue(t *testing.T) {
 
 }
 
-//func TestCollidingHashes(t *testing.T) {
-//	hash := func(val Value) (uint32, error) {
-//	}
-//}
+func TestCollidingHashes(t *testing.T) {
+	Convey("Given an empty hash map", t, func() {
+		hm := New()
+		hm.hashFunc = func(val Value) (uint32, error) {
+			if val == "hello" {
+				return 0, nil
+			} else {
+				return 1024, nil
+			}
+		}
+
+		Convey("When colliding hashes emerge", func() {
+			hm = hm.Assoc("hello", 42)
+			fmt.Println(hm)
+			hm = hm.Assoc("world", 24)
+			fmt.Println(hm)
+			Convey("Both values should be stored", func() {
+				So(hm.Find("world"), ShouldEqual, 24)
+				So(hm.Find("hello"), ShouldEqual, 42)
+			})
+		})
+
+	})
+}

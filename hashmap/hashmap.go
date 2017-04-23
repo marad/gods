@@ -83,7 +83,32 @@ func (vn ValueNode) Copy() Node {
 }
 
 func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
-	return ValueNode{key, val}
+	resultNode := SubtreeNode{}
+	var currentNode *SubtreeNode
+	currentNode = &resultNode
+	currentPart := part
+
+	if key == vn.Key {
+		return ValueNode{key, val}
+	} else {
+		for i := 0; i < 7; i++ {
+			localPart := hashPart(vn.Key, currentPart)
+			newPart := hashPart(key, currentPart)
+			fmt.Println(localPart, newPart)
+
+			if localPart != newPart {
+				currentNode.Branches[localPart] = ValueNode{vn.Key, vn.BaseValue}
+				currentNode.Branches[newPart] = ValueNode{key, val}
+				break
+			} else {
+				newNode := SubtreeNode{}
+				currentNode.Branches[localPart] = &newNode
+				currentNode = &newNode
+				currentPart += 1
+			}
+		}
+	}
+	return resultNode
 }
 
 func (vn ValueNode) Find(key uint32, part uint) Node {
@@ -138,11 +163,11 @@ func New() *HashMap {
 func (hm *HashMap) Assoc(key Value, val Value) *HashMap {
 	hash, _ := hm.hashFunc(key)
 	newRoot, _ := hm.root.Assoc(hash, val, 0).(SubtreeNode)
-	return &HashMap{newRoot, Hash}
+	return &HashMap{newRoot, hm.hashFunc}
 }
 
 func (hm *HashMap) Find(key Value) Value {
-	hash, _ := Hash(key)
+	hash, _ := hm.hashFunc(key)
 	result := hm.root.Find(hash, 0)
 	if vn, ok := result.(ValueNode); ok {
 		return vn.BaseValue

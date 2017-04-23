@@ -53,23 +53,19 @@ func TestHashing(t *testing.T) {
 func TestValueNodeImplementation(t *testing.T) {
 	var vn ValueNode
 	var copied ValueNode
-	var oldVal Value
-	var newVal Value
-	oldVal = "Hello"
-	newVal = "World"
 	Convey("Given a ValueNode", t, func() {
-		vn = ValueNode{123, &oldVal}
+		vn = ValueNode{123, "Hello"}
 		Convey("When assoc-ing new value to the node", func() {
-			copied = vn.Assoc(123, &newVal, 0).(ValueNode)
+			copied = vn.Assoc(123, "World", 0).(ValueNode)
 
 			Convey("Copied node should have the new value", func() {
 				So(copied.Key, ShouldEqual, 123)
-				So(*copied.BaseValue, ShouldEqual, "World")
+				So(copied.BaseValue, ShouldEqual, "World")
 			})
 
 			Convey("Original node should not have changed", func() {
 				So(vn.Key, ShouldEqual, 123)
-				So(*vn.BaseValue, ShouldEqual, "Hello")
+				So(vn.BaseValue, ShouldEqual, "Hello")
 			})
 		})
 	})
@@ -77,20 +73,16 @@ func TestValueNodeImplementation(t *testing.T) {
 
 func TestBasicHashMapFunctionality(t *testing.T) {
 	var emptyMap *HashMap
-	var value Value
-	var value2 Value
-	value = 42
-	value2 = 24
 	Convey("Given an empty map", t, func() {
 		emptyMap = New()
 		Convey("When adding new values", func() {
-			modified := emptyMap.Assoc("myKey", &value)
-			modified2 := modified.Assoc("anotherKey", &value2)
+			modified := emptyMap.Assoc("myKey", 42)
+			modified2 := modified.Assoc("anotherKey", 24)
 
 			Convey("The keys should be findable in the map", func() {
-				So(*modified.Find("myKey"), ShouldEqual, 42)
-				So(*modified2.Find("myKey"), ShouldEqual, 42)
-				So(*modified2.Find("anotherKey"), ShouldEqual, 24)
+				So(modified.Find("myKey"), ShouldEqual, 42)
+				So(modified2.Find("myKey"), ShouldEqual, 42)
+				So(modified2.Find("anotherKey"), ShouldEqual, 24)
 			})
 
 			Convey("But the value of original maps should not be modified", func() {
@@ -104,7 +96,7 @@ func TestBasicHashMapFunctionality(t *testing.T) {
 
 func TestSearchingInEmptyMap(t *testing.T) {
 	var emptyMap *HashMap
-	var value *Value
+	var value Value
 	Convey("Given an empty map", t, func() {
 		emptyMap = New()
 		Convey("When searching for nonexistent key in the map", func() {
@@ -119,20 +111,16 @@ func TestSearchingInEmptyMap(t *testing.T) {
 func TestOverridingAValue(t *testing.T) {
 	var first *HashMap
 	var second *HashMap
-	var value Value
-	var newValue Value
-	value = 42
-	newValue = 24
 
 	Convey("Given a map with a value", t, func() {
-		first = New().Assoc("key", &value)
+		first = New().Assoc("key", 42)
 		Convey("When value is overriden", func() {
-			second = first.Assoc("key", &newValue)
+			second = first.Assoc("key", 24)
 			Convey("The new value should be returned", func() {
-				So(second.Find("key"), ShouldEqual, &newValue)
+				So(second.Find("key"), ShouldEqual, 24)
 			})
 			Convey("But the original map should remain unchanged", func() {
-				So(first.Find("key"), ShouldEqual, &value)
+				So(first.Find("key"), ShouldEqual, 42)
 			})
 		})
 	})

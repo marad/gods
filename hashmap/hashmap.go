@@ -18,13 +18,13 @@ import (
 
 type Node interface {
 	Copy() Node
-	Assoc(key uint32, val *Value, part uint) Node
+	Assoc(key uint32, val Value, part uint) Node
 	Find(key uint32, part uint) Node
 }
 
 type ValueNode struct {
 	Key       uint32
-	BaseValue *Value
+	BaseValue Value
 }
 
 type SubtreeNode struct {
@@ -82,7 +82,7 @@ func (vn ValueNode) Copy() Node {
 	return ValueNode{vn.Key, vn.BaseValue}
 }
 
-func (vn ValueNode) Assoc(key uint32, val *Value, part uint) Node {
+func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
 	return ValueNode{key, val}
 }
 
@@ -102,7 +102,7 @@ func (sn SubtreeNode) Copy() Node {
 	return SubtreeNode{sn.BitMapKey, sn.Branches}
 }
 
-func (sn SubtreeNode) Assoc(key uint32, val *Value, part uint) Node {
+func (sn SubtreeNode) Assoc(key uint32, val Value, part uint) Node {
 	index := hashPart(key, part)
 	node := sn.Branches[index]
 	newNode, _ := sn.Copy().(SubtreeNode)
@@ -135,13 +135,13 @@ func New() *HashMap {
 	return &hm
 }
 
-func (hm *HashMap) Assoc(key Value, val *Value) *HashMap {
+func (hm *HashMap) Assoc(key Value, val Value) *HashMap {
 	hash, _ := hm.hashFunc(key)
 	newRoot, _ := hm.root.Assoc(hash, val, 0).(SubtreeNode)
 	return &HashMap{newRoot, Hash}
 }
 
-func (hm *HashMap) Find(key Value) *Value {
+func (hm *HashMap) Find(key Value) Value {
 	hash, _ := Hash(key)
 	result := hm.root.Find(hash, 0)
 	if vn, ok := result.(ValueNode); ok {

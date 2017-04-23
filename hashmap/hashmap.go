@@ -86,7 +86,7 @@ func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
 	if key == vn.Key {
 		return ValueNode{key, val}
 	} else {
-		for i := 0; i < 7; i++ {
+		for {
 			localPart := hashPart(vn.Key, currentPart)
 			newPart := hashPart(key, currentPart)
 
@@ -98,6 +98,7 @@ func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
 				newNode := SubtreeNode{}
 				currentNode.Branches[localPart] = &newNode
 				currentNode = &newNode
+				// TODO: rehash the key when part > 6 (otherwise it will overflow the 32 bit key)
 				currentPart += 1
 			}
 		}
@@ -165,3 +166,5 @@ func (hm *HashMap) Find(key Value) Value {
 		return nil
 	}
 }
+
+// TODO: Dissoc, Count?

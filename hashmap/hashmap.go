@@ -17,7 +17,6 @@ import (
 )
 
 type Node interface {
-	Copy() Node
 	Assoc(key uint32, val Value, part uint) Node
 	Find(key uint32, part uint) Node
 }
@@ -78,10 +77,6 @@ func Hash(value Value) (uint32, error) {
 ** Value Node Implementation
 /*/
 
-func (vn ValueNode) Copy() Node {
-	return ValueNode{vn.Key, vn.BaseValue}
-}
-
 func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
 	resultNode := SubtreeNode{}
 	var currentNode *SubtreeNode
@@ -94,11 +89,10 @@ func (vn ValueNode) Assoc(key uint32, val Value, part uint) Node {
 		for i := 0; i < 7; i++ {
 			localPart := hashPart(vn.Key, currentPart)
 			newPart := hashPart(key, currentPart)
-			fmt.Println(localPart, newPart)
 
 			if localPart != newPart {
-				currentNode.Branches[localPart] = ValueNode{vn.Key, vn.BaseValue}
-				currentNode.Branches[newPart] = ValueNode{key, val}
+				currentNode.Branches[localPart] = &ValueNode{vn.Key, vn.BaseValue}
+				currentNode.Branches[newPart] = &ValueNode{key, val}
 				break
 			} else {
 				newNode := SubtreeNode{}
@@ -123,14 +117,10 @@ func (vn ValueNode) Find(key uint32, part uint) Node {
 ** Subtree Node Implementation
 /*/
 
-func (sn SubtreeNode) Copy() Node {
-	return SubtreeNode{sn.BitMapKey, sn.Branches}
-}
-
 func (sn SubtreeNode) Assoc(key uint32, val Value, part uint) Node {
 	index := hashPart(key, part)
 	node := sn.Branches[index]
-	newNode, _ := sn.Copy().(SubtreeNode)
+	newNode := SubtreeNode{sn.BitMapKey, sn.Branches}
 	if node == nil {
 		newNode.Branches[index] = ValueNode{key, val}
 		return newNode

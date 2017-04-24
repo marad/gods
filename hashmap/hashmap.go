@@ -16,6 +16,12 @@ import (
 	. "gods"
 )
 
+/*
+ * This is a persistent variation of Hash Array Mapped Trie
+ * for use as hash map.
+ * It is based on Phil Bagwell paper "Ideal Hash Trees".
+ */
+
 type Node interface {
 	Assoc(key uint32, val Value, part uint) Node
 	Find(key uint32, part uint) Node

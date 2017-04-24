@@ -37,9 +37,10 @@ type HashMap struct {
 }
 
 /*/
-** Hash helper functions
+** Binary functions
 /*/
 
+// Count binary ones in uint32
 func popcnt(x uint32) (n byte) {
 	// bit population count, see
 	// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
@@ -51,10 +52,33 @@ func popcnt(x uint32) (n byte) {
 	return byte(x >> 24)
 }
 
-func hashPart(hash uint32, part uint) uint32 {
-	return (hash & (0x1F << (part * 5)) >> (part * 5))
+// Check if the bit at given index is set in bitmap
+func isBitSet(bitmap uint32, index uint) bool {
+	return (bitmap & (1 << index)) > 0
 }
 
+// Set the bit at given index in bitmap
+func setBit(bitmap uint32, index uint) uint32 {
+	return (bitmap | (1 << index))
+}
+
+// Clear the bit at given index in bitmap
+func clearBit(bitmap uint32, index uint) uint32 {
+	return (bitmap &^ (1 << index))
+}
+
+/*/
+** Hash functions
+/*/
+
+// Extract 5 bits of the hash. The part argument is the
+// index of the 5-bit block to extract.
+func hashPart(hash uint32, part uint) uint32 {
+	shift := part * 5
+	return (hash & (0x1F << shift) >> shift)
+}
+
+// Calculate the hash for given string
 func hashString(s string, level int) uint32 {
 	var vHash, a, b uint32
 	vHash, a, b = 0, 31415, 27183
@@ -65,6 +89,7 @@ func hashString(s string, level int) uint32 {
 	return vHash
 }
 
+// Calculate the hash for a Value
 func Hash(value Value) (uint32, error) {
 	switch value.(type) {
 	case string:
@@ -119,6 +144,9 @@ func (vn ValueNode) Find(key uint32, part uint) Node {
 /*/
 
 func (sn SubtreeNode) Assoc(key uint32, val Value, part uint) Node {
+	// TODO: use bitmaps for branch compression:
+	// https://infoscience.epfl.ch/record/64398/files/idealhashtrees.pdf
+	// https://idea.popcount.org/2012-07-25-introduction-to-hamt/
 	index := hashPart(key, part)
 	node := sn.Branches[index]
 	newNode := SubtreeNode{sn.BitMapKey, sn.Branches}

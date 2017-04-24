@@ -16,6 +16,22 @@ func TestPopCountFunc(t *testing.T) {
 	})
 }
 
+func TestBinaryFunctions(t *testing.T) {
+	Convey("isBitSet should work", t, func() {
+		So(isBitSet(5, 0), ShouldEqual, true)
+		So(isBitSet(5, 1), ShouldEqual, false)
+		So(isBitSet(5, 2), ShouldEqual, true)
+	})
+	Convey("setBit should work", t, func() {
+		So(setBit(0, 2), ShouldEqual, 4)
+		So(setBit(1, 2), ShouldEqual, 5)
+	})
+	Convey("clearBit should work", t, func() {
+		So(clearBit(4, 2), ShouldEqual, 0)
+		So(clearBit(5, 2), ShouldEqual, 1)
+	})
+}
+
 func TestGettingHashParts(t *testing.T) {
 	var key uint32
 	var part uint32

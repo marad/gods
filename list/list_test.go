@@ -1,9 +1,10 @@
 package list
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	. "gods"
 	"testing"
+
+	. "github.com/marad/gods"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestCreatingEmptyList(t *testing.T) {

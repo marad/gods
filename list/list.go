@@ -11,7 +11,7 @@ package list
  **/
 
 import (
-	. "gods"
+	. "github.com/marad/gods"
 )
 
 /**

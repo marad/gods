@@ -1,9 +1,10 @@
 package hashmap
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	. "gods"
 	"testing"
+
+	. "github.com/marad/gods"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestPopCountFunc(t *testing.T) {

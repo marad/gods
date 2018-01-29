@@ -13,7 +13,8 @@ package hashmap
 import (
 	"errors"
 	"fmt"
-	. "gods"
+
+	. "github.com/marad/gods"
 )
 
 /*
